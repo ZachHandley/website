@@ -1,0 +1,12 @@
+---
+layout: changelog
+title: A first look at the new Or & Contains database operators
+date: 2024-02-29
+cover: /images/changelog/2024-02-29.png
+---
+
+We’re excited to announce the addition of two new database operators for performing queries, the  `or` and `contains` operators. In this release we aimed to add more flexibility by allowing partial text matches when searching an Appwrite database, as well as the capabilities for writing logical OR queries.
+
+{% arrow_link href="/blog/post/db-operators-overview" %}
+Read the announcement to learn more
+{% /arrow_link %}
