@@ -5,8 +5,8 @@ date: 2024-02-29
 cover: /images/changelog/2024-02-29.png
 ---
 
-We’re excited to announce the addition of two new query methods, `or` and `contains`. In this release, we aimed to add more flexibility by adding array element matches, partial text matches, as well as logical OR queries.
+We’re excited to announce the addition of two new query methods, or and contains. In this release, we aimed to add more flexibility by adding array element matches, partial text matches, as well as logical OR queries.
 
-{% arrow_link href="/blog/post/db-operators-overview" %}
+{% arrow_link href="/blog/post/introducing-new-database-operators" %}
 Read the announcement to learn more
 {% /arrow_link %}
