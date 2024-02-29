@@ -1,16 +1,162 @@
 ---
 layout: article
-title: Start with Astro
-description: Learn how to use Appwrite to add authentication, user management, file storage, and more to your Astro apps.
+title: Start with Astro using TypeScript and Vue
+description: Learn how to integrate Appwrite with Astro using TypeScript and Vue for a powerful full-stack web application.
 difficulty: beginner
 readtime: 3
 ---
 
-Improve the docs, add this guide.
+Set up your first Astro project powered by Appwrite, utilizing TypeScript and Vue for a seamless development experience.
+Note, we're using Vue because Astro uses a special file extension `.astro`. This means that, in client side applications (without SSR),
+the webpages compile to static HTML. Therefore, in order to use reactive components inside it, you can either write script
+directly inside the webpage (use the REST API or the JavaScript SDK) or use a framework like Vue. For this example, we're using Vue.
 
-We still don't have this guide in place, but we do have some great news. 
-The Appwrite docs, just like Appwrite, is completely open sourced.
-This means, anyone can help improve them and add new guides and tutorials. 
+{% section #step-1 step=1 title="Create project" %}
+Navigate to the [Appwrite Console](https://cloud.appwrite.io/console).
 
-If you see this page, **we're actively looking for contributions to this page**.
-Follow our contribution guidelines, open a PR to [our Website repo](https://github.com/appwrite/website), and collaborate with our core team to improve this page.
+{% only_dark %}
+![Create project screen](/images/docs/quick-starts/dark/create-project.png)
+{% /only_dark %}
+{% only_light %}
+![Create project screen](/images/docs/quick-starts/create-project.png)
+{% /only_light %}
+
+If this is your first time using Appwrite, sign up and create your first project.
+
+Add a **Web app** under **Add a platform**, setting the **Hostname** to `localhost`.
+
+{% only_dark %}
+![Add a platform](/images/docs/quick-starts/dark/add-platform.png)
+{% /only_dark %}
+{% only_light %}
+![Add a platform](/images/docs/quick-starts/add-platform.png)
+{% /only_light %}
+
+Proceed by skipping optional steps.
+
+{% /section %}
+{% section #step-2 step=2 title="Create Astro project with Vue" %}
+Start your Astro project and add Vue support:
+
+```bash
+npm create astro@latest my-astro-app
+cd my-astro-app
+npx astro add vue
+npm install appwrite
+```
+
+These commands create your new Astro project, add Vue integration, and install the Appwrite SDK.
+
+{% /section %}
+{% section #step-3 step=3 title="Setup Appwrite SDK" %}
+Locate your project's ID in the **Settings** page.
+
+{% only_dark %}
+![Project settings screen](/images/docs/quick-starts/dark/project-id.png)
+{% /only_dark %}
+{% only_light %}
+![Project settings screen](/images/docs/quick-starts/project-id.png)
+{% /only_light %}
+
+Create a TypeScript file `src/store/appwrite.ts` and initialize Appwrite with the following code, ensuring to replace `<YOUR_PROJECT_ID>` with your actual project ID:
+
+```typescript
+import { Client, Account } from 'appwrite';
+
+// Initialize the Appwrite client
+export const client = new Client();
+export const account = new Account(client);
+
+client
+    .setEndpoint('https://cloud.appwrite.io/v1') // Appwrite Endpoint
+    .setProject('<YOUR_PROJECT_ID>'); // Your project ID
+```
+
+{% /section %}
+{% section #step-4 step=4 title="Implement Authentication" %}
+Implement authentication using Vue within your Astro project. Create a Vue component `src/components/LoginForm.vue` using the `script setup` syntax with TypeScript:
+
+```vue
+<template>
+  <div>
+    <p v-if="loggedInUser.value">{{ `Logged in as ${loggedInUser.value.name}` }}</p>
+    <p v-else>Not logged in</p>
+
+    <input v-model="email" type="email" placeholder="Email" />
+    <input v-model="password" type="password" placeholder="Password" />
+    <input v-model="name" type="text" placeholder="Name" />
+    <button @click="login">Login</button>
+    <button @click="register">Register</button>
+    <button @click="logout">Logout</button>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref } from 'vue';
+import { account } from '../store/appwrite';
+import { ID } from "appwrite";
+
+const email = ref('');
+const password = ref('');
+const name = ref('');
+const loggedInUser = ref(null);
+
+const login = async () => {
+  await account.createEmailSession(email.value, password.value);
+  loggedInUser.value = await account.get();
+};
+
+const register = async () => {
+  await account.create(ID.unique(), email.value, password.value, name.value);
+  await login();
+};
+
+const logout = async () => {
+  await account.deleteSession('current');
+  loggedInUser.value = null;
+};
+</script>
+```
+
+Note: Currently, Pinia is not supported in Astro projects. For state management across components, consider using Nanostores for a framework-agnostic solution.
+
+{% /section %}
+{% section #step-5 step=5 title="Use the LoginForm Component" %}
+To use the `LoginForm.vue` component in an Astro page, create a new `.astro` file, for example, `src/pages/login.astro`:
+
+```ts
+---
+// Import the LoginForm component
+import LoginForm from '../components/LoginForm.vue';
+---
+
+<!-- Use the LoginForm component with client-side hydration -->
+<LoginForm client:load />
+```
+
+This setup leverages Vue for building dynamic user interfaces within Astro, combined with the robust backend features provided by Appwrite.
+
+{% /section %}
+{% section #step-6 step=6 title="Appwrite's Server-Side Rendering (SSR)" %}
+With the upcoming release of Appwrite 1.5, SSR capabilities are being introduced, enabling dynamic content rendering on the server side before sending it to the client. This advancement is particularly beneficial for SEO and for improving the load time of web applications. Stay tuned for detailed integration guidelines once Appwrite 1.5 is officially released.
+
+{% /section %}
+{% section #step-7 step=7 title="Understanding SSR, Hybrid, and Server Modes in Astro" %}
+Astro supports various rendering modes to cater to different development needs:
+
+- **SSR (Server-Side Rendering)**: Generates HTML on the server for each request, improving SEO and performance.
+- **Hybrid Mode**: Combines static site generation with SSR, allowing for pre-rendered pages at build time and dynamic rendering as needed.
+- **Server Mode**: Astro fully renders your application on the server at runtime, ideal for applications that require personalization or real-time data.
+
+Astro also offers various adapters to deploy your application across different hosting providers, ensuring flexibility and scalability for your projects.
+
+{% /section %}
+{% section #step-8 step=8 title="All set" %}
+Run your Astro project using:
+
+```bash
+npm run dev
+```
+
+Navigate to [http://localhost:3000](http://localhost:3000) in your browser to see your application in action.
+{% /section %}
