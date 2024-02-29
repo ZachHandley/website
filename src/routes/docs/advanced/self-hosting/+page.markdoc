@@ -86,6 +86,29 @@ Choose from one of the providers below:
 * [Click to install](https://www.linode.com/marketplace/apps/appwrite/appwrite/)
 {% /table %}
 
+# Installing without built-in Traefik or With an Existing Traefik Installation
+
+To install Appwrite without the built-in Traefik or with an existing Traefik installation, follow these steps:
+
+1. **Remove the Traefik service**: In your `docker-compose.yml` file, remove the entire `traefik` service block.
+
+2. **Expose Appwrite on a given port**: In the `appwrite` service block, add a `ports` directive to expose Appwrite on a specific port. For example, to expose Appwrite on port 9501, you would add `- 9501:80` under `ports`.
+```yaml
+appwrite:
+    ...
+    ports:
+        - 9501:80
+    ...
+```
+
+3. **Change the Networks**: At the bottom of your `docker-compose.yml` file, replace the `gateway` network with your external network for Traefik or the default network if you're using Traefik on the default network.
+
+4. **Change the Traefik labels for the entrypoints**: By default, Appwrite uses `appwrite_web` and `appwrite_websecure` for its entrypoints. If you're using Traefik, change these labels to `web` and `websecure` respectively.
+
+5. **Add Appwrite services to the Traefik network**: If you're using a network for Traefik, you need to add the `appwrite` and `appwrite-realtime` services to it. If you're using the default network, you don't need to do anything. All other services should be in the `appwrite` network.
+
+Please note that these instructions assume you're using Traefik as your reverse proxy. If you're using a different reverse proxy, you'll need to adjust these instructions accordingly.
+
 
 # Next steps {% #next-steps %}
 
